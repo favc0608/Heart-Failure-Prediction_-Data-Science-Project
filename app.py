@@ -9,7 +9,7 @@ st.set_page_config(page_title="Asistente de Diagnóstico Cardíaco", layout="cen
 # 1. Cargar el modelo guardado
 @st.cache_resource
 def load_model():
-    return joblib.load('modelo_heart_disease_stacking.pkl')
+    return joblib.load("model/modelo_heart_disease_stacking.pkl")
 
 model = load_model()
 
