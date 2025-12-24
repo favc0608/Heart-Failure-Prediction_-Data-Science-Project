@@ -12,6 +12,7 @@ def plot_simple_hist(data, columns):
         sns.histplot(data[col], kde=True, color='teal')
         plt.title(col)
     plt.tight_layout()
+    plt.savefig("../reports/figures/histrogramas_numericos.png", dpi=300)
     plt.show()
 
 
@@ -26,7 +27,7 @@ def plot_categorical_vs_target(data, cat_cols, target):
         sns.countplot(x=col, hue=target, data=data, palette='viridis')
         plt.title(f'{col} vs {target}')
         plt.xticks(rotation=15)
-        
+    plt.savefig("../reports/figures/categoricas_vs_target.png", dpi=300)    
     plt.tight_layout()
     plt.show()
 
@@ -46,6 +47,7 @@ def plot_correlation_heatmap(data, num_cols):
     )
     
     plt.title("HEAT MAP CORRELATION", fontsize=15)
+    plt.savefig("../reports/figures/heatmap_correlacion.png", dpi=300)
     plt.show()
 
 
@@ -69,7 +71,7 @@ def binningimportance(df,num_cols, target_col):
             strength = "Weak predictor"
         else:
             strength = "Not useful"
-
+        binning_table.to_markdown(f"../reports/tables/binning_{col}.md", index=False)
         print(f"\n Total IV: {iv:.4f} - {strength}")
         print("=" * 80)
         

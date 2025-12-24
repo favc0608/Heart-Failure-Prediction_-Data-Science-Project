@@ -1,47 +1,18 @@
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
+import pandas as pd
+from pathlib import Path
+import joblib
+import optuna
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier, StackingClassifier
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.metrics import classification_report, roc_auc_score, confusion_matrix
-from sklearn.metrics import roc_auc_score
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-import joblib
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from sklearn.linear_model import LogisticRegression
-import optuna
-from sklearn.pipeline import Pipeline
-import optuna
-import pandas as pd
-from sklearn.model_selection import train_test_split, cross_val_score 
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-import joblib
-import optuna
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score
-from sklearn.ensemble import StackingClassifier
-
 from sklearn.inspection import permutation_importance
-import matplotlib.pyplot as plt
-import pandas as pd
 
 
 
