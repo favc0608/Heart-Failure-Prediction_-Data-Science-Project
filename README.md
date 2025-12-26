@@ -110,9 +110,6 @@ If you want to test online , try it here : https://favc0608-heart-failure-predic
 Note: these are representative values observed locally during development; re-runs may vary due to data splits and random seeds.
 
 ## Best practices and recommendations
-- Standardize artifact paths: use `model/` at repo root for saved models and ensure notebooks and app reference the same path.
-- Persist Optuna studies to disk (SQLite) for reproducibility: `optuna.create_study(storage="sqlite:///optuna.db", ...)`.
-- Implement nested CV for unbiased model selection when reporting final performance.
 - Add calibration plots (Platt scaling / isotonic) and SHAP analyses for per-sample explanations.
 - Evaluate fairness metrics across demographic groups and include limitations / clinical disclaimer.
 - Add CI, unit tests for preprocessors, and an environment file (environment.yml or requirements pinned).
