@@ -1,3 +1,5 @@
+# NOTE: Spanish comments were replaced with professional English.
+# TODO: Consider adding function docstrings, type hints, and standardized return values (e.g., metrics dicts)
 import pandas as pd
 from pathlib import Path
 import joblib
@@ -13,8 +15,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.inspection import permutation_importance
-
-
 
 def baseline(df, target_column):
     X= df.drop(columns=[target_column])
@@ -44,14 +44,14 @@ def baseline(df, target_column):
     print(f"ROC-AUC Score: {auc:.4f}")
     
 def randomforest_basemodel(df, target):
-    # 1. Dividir los datos en características (X) y objetivo (y)
+    # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
     y = df[target]
     
-    # 2. Dividir en conjunto de entrenamiento y prueba
+    # 2. Split into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 3. Preprocesamiento: Escalado y codificación
+    # 3. Preprocessing: scaling for numerical and one-hot encoding for categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
     
@@ -60,20 +60,20 @@ def randomforest_basemodel(df, target):
         ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
     ])
     
-    # 4. Crear el pipeline con RandomForestClassifier
+    # 4. Build pipeline with RandomForestClassifier
     pipe = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('classifier', RandomForestClassifier(random_state=42))
     ])
     
-    # 5. Entrenar el modelo
+    # 5. Fit the model
     pipe.fit(X_train, y_train)
     
-    # 6. Hacer predicciones
+    # 6. Predict on the test set
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
-    # 7. Evaluar el modelo
+    # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
@@ -85,14 +85,14 @@ def randomforest_basemodel(df, target):
     print(f"ROC-AUC Score: {auc:.4f}")
 
 def svc_basemodel(df, target):
-    # 1. Dividir los datos en características (X) y objetivo (y)
+    # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
     y = df[target]
     
-    # 2. Dividir en conjunto de entrenamiento y prueba
+    # 2. Split into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 3. Preprocesamiento: Escalado y codificación
+    # 3. Preprocessing: scaling for numerical and one-hot encoding for categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
     
@@ -101,20 +101,20 @@ def svc_basemodel(df, target):
         ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
     ])
     
-    # 4. Crear el pipeline con SVC
+    # 4. Build pipeline with SVC (probability enabled)
     pipe = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('classifier', SVC(probability=True, random_state=42))
     ])
     
-    # 5. Entrenar el modelo
+    # 5. Fit the model
     pipe.fit(X_train, y_train)
     
-    # 6. Hacer predicciones
+    # 6. Predict on the test set
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
-    # 7. Evaluar el modelo
+    # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
@@ -126,14 +126,14 @@ def svc_basemodel(df, target):
     print(f"ROC-AUC Score: {auc:.4f}")
 
 def decisiontree_basemodel(df, target):
-    # 1. Dividir los datos en características (X) y objetivo (y)
+    # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
     y = df[target]
     
-    # 2. Dividir en conjunto de entrenamiento y prueba
+    # 2. Split into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 3. Preprocesamiento: Escalado y codificación
+    # 3. Preprocessing: pass-through numerical and one-hot encode categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
     
@@ -142,20 +142,20 @@ def decisiontree_basemodel(df, target):
         ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
     ])
     
-    # 4. Crear el pipeline con DecisionTreeClassifier
+    # 4. Build pipeline with DecisionTreeClassifier
     pipe = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('classifier', DecisionTreeClassifier(random_state=42))
     ])
     
-    # 5. Entrenar el modelo
+    # 5. Fit the model
     pipe.fit(X_train, y_train)
     
-    # 6. Hacer predicciones
+    # 6. Predict on the test set
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
-    # 7. Evaluar el modelo
+    # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
@@ -168,14 +168,14 @@ def decisiontree_basemodel(df, target):
 
 def xgboost_basemodel(df, target):
     import xgboost as xgb
-    # 1. Dividir los datos en características (X) y objetivo (y)
+    # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
     y = df[target]
     
-    # 2. Dividir en conjunto de entrenamiento y prueba
+    # 2. Split into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 3. Preprocesamiento: Escalado y codificación
+    # 3. Preprocessing: pass-through numerical and one-hot encode categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
     
@@ -184,18 +184,18 @@ def xgboost_basemodel(df, target):
         ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
     ])
     
-    # 4. Crear el pipeline con XGBClassifier
+    # 4. Build pipeline with XGBClassifier
     pipe = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('classifier', xgb.XGBClassifier( eval_metric='logloss', random_state=42))
     ])
     
     pipe.fit(X_train, y_train)
-        # 6. Hacer predicciones
+    # 6. Predict on the test set
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
-    # 7. Evaluar el modelo
+    # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
@@ -420,6 +420,7 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
             ('cat', OneHotEncoder(handle_unknown='ignore'), col_cat)
         ])
 
+    # Resolve logistic penalty name from Optuna trial keys
     penalty_lr = params_lr.get('penalty_lib') or params_lr.get('penalty_saga') or params_lr.get('penalty_lbfgs')
     
     model_lr = LogisticRegression(
@@ -479,16 +480,17 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
 
 
 def plot_ensemble_importance(model, X_test, y_test):
-    # Calculamos la importancia por permutación
+    # Compute permutation importance (impact on ROC-AUC when a feature is shuffled)
     results = permutation_importance(model, X_test, y_test, n_repeats=10, random_state=42, scoring='roc_auc')
     
-    # Organizamos los datos
+    # Organize importance results into a Series and sort for plotting
     feature_importance = pd.Series(results.importances_mean, index=X_test.columns)
     feature_importance = feature_importance.sort_values(ascending=True)
 
-    # Graficamos
+    # Plot horizontal bar chart for feature importance
     plt.figure(figsize=(10, 6))
     feature_importance.plot(kind='barh', color='skyblue')
-    plt.title('Importancia de Variables: Ensamble Triple (0.95 AUC)')
-    plt.xlabel('Caída en ROC-AUC al desordenar la variable')
+    plt.title('Variable Importance: Triple Ensemble (0.95 AUC)')
+    plt.xlabel('Decrease in ROC-AUC when feature is permuted')
+    plt.savefig('../reports/figures/ensemble_feature_importance.png', bbox_inches='tight') 
     plt.show()
