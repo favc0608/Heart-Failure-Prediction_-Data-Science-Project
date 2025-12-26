@@ -98,6 +98,8 @@ python -m streamlit run app.py
 ```
 - The app loads the artifact `model/modelo_heart_disease_stacking.pkl`, accepts user inputs, shows predicted probability and a simple risk label, and displays basic explainability plots.
 
+If you want to test online , try it here : https://favc0608-heart-failure-prediction--data-science-proj-app-mxautc.streamlit.app/
+
 ## Reported results (representative)
 - Example runs (notebook outputs):
   - Random Forest baseline ROC-AUC: ≈ 0.95–0.96
