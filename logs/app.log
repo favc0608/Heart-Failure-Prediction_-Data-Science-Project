@@ -1,5 +1,0 @@
-2025-12-26 15:11:39,422 INFO Prediction made: {"inputs": {"Age": 45, "Sex": "M", "ChestPainType": "ATA"}, "result": {"probability": 0.05674176476402504, "risk": "Low"}}
-2025-12-26 15:11:44,288 INFO Prediction made: {"inputs": {"Age": 68, "Sex": "M", "ChestPainType": "ASY"}, "result": {"probability": 0.9424975890817988, "risk": "High"}}
-2025-12-26 15:13:38,505 INFO Prediction made: {"inputs": {"Age": 50, "Sex": "M", "ChestPainType": "ATA"}, "result": {"probability": 0.08122259444229196, "risk": "Low"}}
-2025-12-26 15:13:39,426 INFO Prediction made: {"inputs": {"Age": 50, "Sex": "M", "ChestPainType": "ATA"}, "result": {"probability": 0.08122259444229196, "risk": "Low"}}
-2025-12-26 15:13:56,588 INFO Prediction made: {"inputs": {"Age": 68, "Sex": "M", "ChestPainType": "ASY"}, "result": {"probability": 0.9424975890817988, "risk": "High"}}
