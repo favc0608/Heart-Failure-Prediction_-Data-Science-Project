@@ -19,7 +19,7 @@ from sklearn.inspection import permutation_importance
 def baseline(df, target_column):
     X= df.drop(columns=[target_column])
     y= df[target_column]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     num_cols= X.select_dtypes(include=['int64', 'float64']).columns
     cat_cols= X.select_dtypes(include=['object', 'bool']).columns
     preprocessor = ColumnTransformer(
@@ -31,9 +31,19 @@ def baseline(df, target_column):
         ('preprocessor', preprocessor),
         ('LogisticRegression', LogisticRegression(random_state=42))
     ])
+    cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+    score= cross_val_score(
+        pipe, X_train, y_train, cv=cv, scoring='roc_auc')
+    
+    print(f"Resultados por fold: {score}")
+    print(f"Media: {score.mean():.3f} (+/- {score.std() * 2:.3f})")
+
     pipe.fit(X_train, y_train)
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
+    y_pred_train= pipe.predict(X_train)
+    auc_train = roc_auc_score(y_train, pipe.predict_proba(X_train)[:, 1])
     auc = roc_auc_score(y_test, y_probs)
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
@@ -41,8 +51,9 @@ def baseline(df, target_column):
     print("Score in Test set:", pipe.score(X_test, y_test))
     print("\n--- Informe de Clasificación (Test Set) ---")
     print(classification_report(y_test, y_pred))
-    print(f"ROC-AUC Score: {auc:.4f}")
-    
+    print(f"ROC-AUC Score in test: {auc:.4f}")
+    print(f"ROC-AUC Score in train: {auc_train:.4f}")
+
 def randomforest_basemodel(df, target):
     # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
@@ -65,6 +76,10 @@ def randomforest_basemodel(df, target):
         ('preprocessor', preprocessor),
         ('classifier', RandomForestClassifier(random_state=42))
     ])
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc')
+    print(f"Resultados por fold: {scores}")
+    print(f"Media: {scores.mean():.3f} (+/- {scores.std() * 2:.3f})")
     
     # 5. Fit the model
     pipe.fit(X_train, y_train)
@@ -74,6 +89,9 @@ def randomforest_basemodel(df, target):
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
     # 7. Evaluate the model
+    y_probs_train = pipe.predict_proba(X_train)[:, 1]
+    auc_train = roc_auc_score(y_train, y_probs_train)
+    auc = roc_auc_score(y_test, y_probs)
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
@@ -81,8 +99,8 @@ def randomforest_basemodel(df, target):
     print("\n--- Informe de Clasificación (Test Set) ---")
     print(classification_report(y_test, y_pred))
     
-    auc = roc_auc_score(y_test, y_probs)
     print(f"ROC-AUC Score: {auc:.4f}")
+    print(f"ROC-AUC Score in train: {auc_train:.4f}")
 
 def svc_basemodel(df, target):
     # 1. Split data into features (X) and target (y)
@@ -106,6 +124,10 @@ def svc_basemodel(df, target):
         ('preprocessor', preprocessor),
         ('classifier', SVC(probability=True, random_state=42))
     ])
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc')
+    print(f"Resultados por fold: {scores}")
+    print(f"Media: {scores.mean():.3f} (+/- {scores.std() * 2:.3f})")
     
     # 5. Fit the model
     pipe.fit(X_train, y_train)
@@ -114,6 +136,9 @@ def svc_basemodel(df, target):
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
+    y_probs_train = pipe.predict_proba(X_train)[:, 1]
+    auc_train = roc_auc_score(y_train, y_probs_train)
+    auc = roc_auc_score(y_test, y_probs)
     # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
@@ -122,8 +147,8 @@ def svc_basemodel(df, target):
     print("\n--- Informe de Clasificación (Test Set) ---")
     print(classification_report(y_test, y_pred))
     
-    auc = roc_auc_score(y_test, y_probs)
     print(f"ROC-AUC Score: {auc:.4f}")
+    print(f"ROC-AUC Score in train: {auc_train:.4f}")
 
 def decisiontree_basemodel(df, target):
     # 1. Split data into features (X) and target (y)
@@ -147,6 +172,10 @@ def decisiontree_basemodel(df, target):
         ('preprocessor', preprocessor),
         ('classifier', DecisionTreeClassifier(random_state=42))
     ])
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc')
+    print(f"Resultados por fold: {scores}")
+    print(f"Media: {scores.mean():.3f} (+/- {scores.std() * 2:.3f})")
     
     # 5. Fit the model
     pipe.fit(X_train, y_train)
@@ -155,6 +184,9 @@ def decisiontree_basemodel(df, target):
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
+    y_probs_train = pipe.predict_proba(X_train)[:, 1]
+    auc_train = roc_auc_score(y_train, y_probs_train)
+    auc = roc_auc_score(y_test, y_probs)
     # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
@@ -163,8 +195,8 @@ def decisiontree_basemodel(df, target):
     print("\n--- Informe de Clasificación (Test Set) ---")
     print(classification_report(y_test, y_pred))
     
-    auc = roc_auc_score(y_test, y_probs)
     print(f"ROC-AUC Score: {auc:.4f}")
+    print(f"ROC-AUC Score in train: {auc_train:.4f}")
 
 def xgboost_basemodel(df, target):
     import xgboost as xgb
@@ -189,28 +221,34 @@ def xgboost_basemodel(df, target):
         ('preprocessor', preprocessor),
         ('classifier', xgb.XGBClassifier( eval_metric='logloss', random_state=42))
     ])
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc')
+    print(f"Resultados por fold: {scores}")
+    print(f"Media: {scores.mean():.3f} (+/- {scores.std() * 2:.3f})")
     
     pipe.fit(X_train, y_train)
     # 6. Predict on the test set
     y_pred = pipe.predict(X_test)
     y_probs = pipe.predict_proba(X_test)[:, 1]
     
+    y_probs_train = pipe.predict_proba(X_train)[:, 1]
+    auc_train = roc_auc_score(y_train, y_probs_train)
+    auc = roc_auc_score(y_test, y_probs)
     # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
     print("Score in Training set:", pipe.score(X_train, y_train))
     print("Score in Test set:", pipe.score(X_test, y_test))
     print("\n--- Informe de Clasificación (Test Set) ---")
-    print(classification_report(y_test, y_pred))
-    
-    auc = roc_auc_score(y_test, y_probs)
+    print(classification_report(y_test, y_pred))   
     print(f"ROC-AUC Score: {auc:.4f}")
+    print(f"ROC-AUC Score in train: {auc_train:.4f}")
 
 
 def logistic_regression_optuna(df,target):
     X= df.drop(columns=[target])
     y= df[target]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     col_num=X.select_dtypes(include=['int64', 'float64']).columns.tolist()
     col_cat=X.select_dtypes(include=['object', 'category']).columns.tolist()
     preprocessor=  ColumnTransformer(
@@ -241,7 +279,8 @@ def logistic_regression_optuna(df,target):
             random_state=42
         )
         pipe=Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
-        score = cross_val_score(pipe, X_train, y_train, cv=5, scoring='roc_auc').mean()
+        cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        score = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc').mean()
         return score
 
     study= optuna.create_study(direction='maximize')
@@ -258,7 +297,6 @@ def logistic_regression_optuna(df,target):
     )
     best_pipe= Pipeline(steps=[('preprocessor', preprocessor), ('model', best_model)])
     best_pipe.fit(X_train, y_train)
-
     y_pred= best_pipe.predict(X_test)
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
@@ -266,7 +304,8 @@ def logistic_regression_optuna(df,target):
     print(classification_report(y_test, y_pred))
     y_proba= best_pipe.predict_proba(X_test)[:, 1]
     roc_auc= roc_auc_score(y_test, y_proba)
-    print(f"ROC-AUC Score: {roc_auc:.4f}")
+    print(f"ROC-AUC Score in test: {roc_auc:.4f}")
+    print(f"ROC-AUC Score in train: {roc_auc_score(y_train, best_pipe.predict_proba(X_train)[:, 1]):.4f}")
 
     print("score in training", best_pipe.score(X_train, y_train))
     print("score in testing", best_pipe.score(X_test, y_test))
@@ -277,7 +316,7 @@ def random_forest_optuna(df, target):
     X = df.drop(columns=[target])
     y = df[target]
     
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     col_num = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
     col_cat = X.select_dtypes(include=['object', 'category']).columns.tolist()
@@ -306,9 +345,9 @@ def random_forest_optuna(df, target):
             random_state=42,
             n_jobs=-1
         )
-        
+        cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         pipe = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
-        score = cross_val_score(pipe, X_train, y_train, cv=5, scoring='roc_auc').mean()
+        score = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc').mean()
         return score
 
     study = optuna.create_study(direction='maximize')
@@ -337,8 +376,8 @@ def random_forest_optuna(df, target):
     print(classification_report(y_test, y_pred))
     
     roc_auc = roc_auc_score(y_test, y_proba)
-    print(f"ROC-AUC Score: {roc_auc:.4f}")
-    
+    print(f"ROC-AUC Score in test: {roc_auc:.4f}")
+    print(f"ROC-AUC Score in train: {roc_auc_score(y_train, best_pipe.predict_proba(X_train)[:, 1]):.4f}")
     print("score in training", best_pipe.score(X_train, y_train))
     print("score in testing", best_pipe.score(X_test, y_test))
     
@@ -350,7 +389,7 @@ def svc_optuna(df, target):
     X = df.drop(columns=[target])
     y = df[target]
     
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     col_num = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
     col_cat = X.select_dtypes(include=['object', 'category']).columns.tolist()
@@ -375,7 +414,8 @@ def svc_optuna(df, target):
         )
         
         pipe = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
-        score = cross_val_score(pipe, X_train, y_train, cv=5, scoring='roc_auc').mean()
+        cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        score = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc').mean()
         return score
 
     study = optuna.create_study(direction='maximize')
@@ -398,7 +438,8 @@ def svc_optuna(df, target):
     print("--- SVC OPTIMIZADO ---")
     print(confusion_matrix(y_test, y_pred))
     print(classification_report(y_test, y_pred))
-    print(f"ROC-AUC Score: {roc_auc_score(y_test, y_proba):.4f}")
+    print(f"ROC-AUC Score in test: {roc_auc_score(y_test, y_proba):.4f}")
+    print(f"ROC-AUC Score in train: {roc_auc_score(y_train, best_pipe.predict_proba(X_train)[:, 1]):.4f}")
     print("score in training", best_pipe.score(X_train, y_train))
     print("score in testing", best_pipe.score(X_test, y_test))
     
@@ -409,7 +450,7 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
     X = df.drop(columns=[target])
     y = df[target]
     
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     col_num = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
     col_cat = X.select_dtypes(include=['object', 'category']).columns.tolist()
@@ -456,11 +497,11 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
         ('rf', Pipeline(steps=[('preprocessor', preprocessor), ('model', model_rf)])),
         ('svc', Pipeline(steps=[('preprocessor', preprocessor), ('model', model_svc)]))
     ]
-
+    cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     stacking_model = StackingClassifier(
         estimators=base_models,
         final_estimator=LogisticRegression(),
-        cv=5,
+        cv=cv,
         stack_method='predict_proba'
     )
 
@@ -472,7 +513,8 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
     print("\n--- RESULTADOS DEL ENSAMBLE TRIPLE ---")
     print(confusion_matrix(y_test, y_pred))
     print(classification_report(y_test, y_pred))
-    print(f"ROC-AUC Score: {roc_auc_score(y_test, y_proba):.4f}")
+    print(f"ROC-AUC Score in test: {roc_auc_score(y_test, y_proba):.4f}")
+    print(f"ROC-AUC Score in train: {roc_auc_score(y_train, stacking_model.predict_proba(X_train)[:, 1]):.4f}")
     print(f"Score in testing: {stacking_model.score(X_test, y_test):.4f}")
     print(f"Score in training: {stacking_model.score(X_train, y_train):.4f}")
 
