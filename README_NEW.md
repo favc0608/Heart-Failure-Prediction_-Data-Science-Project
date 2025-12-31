@@ -75,7 +75,7 @@ This project builds a **machine learning pipeline** to predict heart disease ris
 | Random Forest (baseline) | 1.00 | 0.94 | ⚠️ Medium overfit |
 | Decision Tree (baseline) | 1.00 | 0.80 | 🔴 High overfit |
 | XGBoost (baseline) | 1.00 | 0.91 | 🔴 High overfit |
-| **🥇 Stacking Ensemble (tuned)** | **0.96** | **0.95** | ✅ **Best model** |
+| **🥇 Stacking Ensemble (tuned)** | **0.97** | **0.94** | ✅ **Best model** |
 
 > The stacking ensemble combines Logistic Regression + Random Forest + SVC with a meta-learner, achieving robust generalization.
 
@@ -234,7 +234,8 @@ jupyter lab
 | Baseline | Random Forest | 0.94 | Captures non-linearity |
 | **Tuned** | Logistic Regression | 0.92 | Optuna optimized |
 | **Tuned** | Random Forest | 0.94 | Reduced overfitting |
-| **Final** | **Stacking Ensemble** | **0.95** | **Production model** |
+| **Final** | **Stacking Ensemble** | **0.935** | **Production model/ Reduced overfitting** |
+
 
 ---
 
@@ -243,6 +244,10 @@ jupyter lab
 ### Feature Correlation Heatmap
 <p align="center">
   <img src="reports/figures/heatmap_correlacion.png" width="600" alt="Correlation Heatmap">
+</p>
+### Numerical Features vs Target
+<p align="center">
+  <img src="reports/figures/histogramas_numericos_vs_target.png" width="600" alt="Numerical Features vs Target">
 </p>
 
 ### Feature Importance (Ensemble)
@@ -276,23 +281,20 @@ jupyter lab
 
 - [ ] 🔬 Add SHAP values for individual prediction explanations
 - [ ] 📊 Implement calibration plots (Platt scaling)
-- [ ] ⚖️ Evaluate fairness metrics across demographic groups
-- [ ] 🧪 Add unit tests and CI/CD pipeline
 - [ ] 📱 Create API endpoint with FastAPI
-- [ ] 🩺 Clinical disclaimer and limitations section
 
 ---
 
 ## 📫 Contact
 
 <p align="center">
-  <a href="https://www.linkedin.com/in/YOUR_LINKEDIN/">
+  <a href="https://www.linkedin.com/in/frank-alexander-vargas-chavez-664980381/">
     <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn">
   </a>
-  <a href="mailto:your.email@example.com">
+  <a href="mailto:frankvargaschavez201@gmail.com">
     <img src="https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail" alt="Email">
   </a>
-  <a href="https://github.com/YOUR_USERNAME">
+  <a href="https://github.com/favc0608">
     <img src="https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github" alt="GitHub">
   </a>
 </p>
@@ -335,6 +337,3 @@ Combined from 5 heart disease datasets:
   <strong>⭐ If you found this project useful, please consider giving it a star! ⭐</strong>
 </p>
 
-<p align="center">
-  Made with ❤️ for Data Science
-</p>
