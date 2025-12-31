@@ -19,7 +19,7 @@ from sklearn.inspection import permutation_importance
 def baseline(df, target_column):
     X= df.drop(columns=[target_column])
     y= df[target_column]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     num_cols= X.select_dtypes(include=['int64', 'float64']).columns
     cat_cols= X.select_dtypes(include=['object', 'bool']).columns
     preprocessor = ColumnTransformer(
@@ -60,7 +60,7 @@ def randomforest_basemodel(df, target):
     y = df[target]
     
     # 2. Split into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     # 3. Preprocessing: scaling for numerical and one-hot encoding for categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
@@ -108,7 +108,7 @@ def svc_basemodel(df, target):
     y = df[target]
     
     # 2. Split into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     # 3. Preprocessing: scaling for numerical and one-hot encoding for categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
@@ -139,6 +139,8 @@ def svc_basemodel(df, target):
     y_probs_train = pipe.predict_proba(X_train)[:, 1]
     auc_train = roc_auc_score(y_train, y_probs_train)
     auc = roc_auc_score(y_test, y_probs)
+
+
     # 7. Evaluate the model
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred.round()))
@@ -150,13 +152,14 @@ def svc_basemodel(df, target):
     print(f"ROC-AUC Score: {auc:.4f}")
     print(f"ROC-AUC Score in train: {auc_train:.4f}")
 
+
 def decisiontree_basemodel(df, target):
     # 1. Split data into features (X) and target (y)
     X = df.drop(columns=[target])
     y = df[target]
     
     # 2. Split into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     # 3. Preprocessing: pass-through numerical and one-hot encode categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
@@ -205,7 +208,7 @@ def xgboost_basemodel(df, target):
     y = df[target]
     
     # 2. Split into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
     # 3. Preprocessing: pass-through numerical and one-hot encode categorical
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
@@ -258,7 +261,7 @@ def logistic_regression_optuna(df,target):
         ])
     
     def objective(trial):
-        C= trial.suggest_float('C', 1e-5, 1e2, log=True)
+        C = trial.suggest_loguniform('C', 1e-5, 1e2)
         solver = trial.suggest_categorical('solver', ['lbfgs', 'liblinear', 'saga'])
         if solver == 'liblinear':
             penalty = trial.suggest_categorical('penalty_lib', ['l1', 'l2'])
@@ -268,9 +271,8 @@ def logistic_regression_optuna(df,target):
             penalty = trial.suggest_categorical('penalty_lbfgs', ['l2', None])
         l1_ratio = None
         if penalty == 'elasticnet':
-            l1_ratio = trial.suggest_float('l1_ratio', 0, 1)    
-        
-        model= LogisticRegression(
+            l1_ratio = trial.suggest_float('l1_ratio', 0.0, 1.0)
+        model = LogisticRegression(
             C=C,
             solver=solver,
             penalty=penalty,
@@ -283,33 +285,40 @@ def logistic_regression_optuna(df,target):
         score = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc').mean()
         return score
 
-    study= optuna.create_study(direction='maximize')
+    study = optuna.create_study(direction='maximize')
     study.optimize(lambda trial: objective(trial), n_trials=100)
-        
 
-    best_model= LogisticRegression(
+    penalty = (
+        study.best_params.get('penalty_lib')
+        or study.best_params.get('penalty_saga')
+        or study.best_params.get('penalty_lbfgs')
+    )
+    l1_ratio = study.best_params.get('l1_ratio')
+
+    best_model = LogisticRegression(
         C=study.best_params['C'],
         solver=study.best_params['solver'],
-        penalty=study.best_params.get('penalty_lib') or study.best_params.get('penalty_saga') or study.best_params.get('penalty_lbfgs'),
-        l1_ratio=study.best_params.get('l1_ratio', None),
+        penalty=penalty,
+        l1_ratio=l1_ratio,
         max_iter=1000,
-        random_state=42 
+        random_state=42
     )
-    best_pipe= Pipeline(steps=[('preprocessor', preprocessor), ('model', best_model)])
+    best_pipe = Pipeline([('preprocessor', preprocessor), ('model', best_model)])
     best_pipe.fit(X_train, y_train)
-    y_pred= best_pipe.predict(X_test)
+
+    y_pred = best_pipe.predict(X_test)
+    y_proba = best_pipe.predict_proba(X_test)[:, 1]
+    roc_auc = roc_auc_score(y_test, y_proba)
+
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
-    y_proba= best_pipe.predict_proba(X_test)[:, 1]
-    roc_auc= roc_auc_score(y_test, y_proba)
     print(f"ROC-AUC Score in test: {roc_auc:.4f}")
     print(f"ROC-AUC Score in train: {roc_auc_score(y_train, best_pipe.predict_proba(X_train)[:, 1]):.4f}")
+    print("Score in training", best_pipe.score(X_train, y_train))
+    print("Score in testing", best_pipe.score(X_test, y_test))
 
-    print("score in training", best_pipe.score(X_train, y_train))
-    print("score in testing", best_pipe.score(X_test, y_test))
-    
     return study.best_params
 
 def random_forest_optuna(df, target):
@@ -329,9 +338,9 @@ def random_forest_optuna(df, target):
     
     def objective(trial):
         n_estimators = trial.suggest_int('n_estimators', 5, 500)
-        max_depth = trial.suggest_int('max_depth', 3, 30)
-        min_samples_split = trial.suggest_int('min_samples_split', 2, 20)
-        min_samples_leaf = trial.suggest_int('min_samples_leaf', 1, 20)
+        max_depth = trial.suggest_int('max_depth', 3, 25)
+        min_samples_split = trial.suggest_int('min_samples_split', 5, 20)
+        min_samples_leaf = trial.suggest_int('min_samples_leaf', 3, 20)
         max_features = trial.suggest_categorical('max_features', ['sqrt', 'log2', None])
         criterion = trial.suggest_categorical('criterion', ['gini', 'entropy'])
         
@@ -385,68 +394,7 @@ def random_forest_optuna(df, target):
 
 
 
-def svc_optuna(df, target):
-    X = df.drop(columns=[target])
-    y = df[target]
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    
-    col_num = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
-    col_cat = X.select_dtypes(include=['object', 'category']).columns.tolist()
-    
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', StandardScaler(), col_num),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), col_cat)
-        ])
-    
-    def objective(trial):
-        C = trial.suggest_float('C', 1e-3, 1e3, log=True)
-        kernel = trial.suggest_categorical('kernel', ['linear', 'poly', 'rbf', 'sigmoid'])
-        gamma = trial.suggest_categorical('gamma', ['scale', 'auto'])
-        
-        model = SVC(
-            C=C,
-            kernel=kernel,
-            gamma=gamma,
-            probability=True,
-            random_state=42
-        )
-        
-        pipe = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
-        cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-        score = cross_val_score(pipe, X_train, y_train, cv=cv, scoring='roc_auc').mean()
-        return score
-
-    study = optuna.create_study(direction='maximize')
-    study.optimize(lambda trial: objective(trial), n_trials=50)
-
-    best_model = SVC(
-        C=study.best_params['C'],
-        kernel=study.best_params['kernel'],
-        gamma=study.best_params['gamma'],
-        probability=True,
-        random_state=42
-    )
-    
-    best_pipe = Pipeline(steps=[('preprocessor', preprocessor), ('model', best_model)])
-    best_pipe.fit(X_train, y_train)
-
-    y_pred = best_pipe.predict(X_test)
-    y_proba = best_pipe.predict_proba(X_test)[:, 1]
-    
-    print("--- SVC OPTIMIZADO ---")
-    print(confusion_matrix(y_test, y_pred))
-    print(classification_report(y_test, y_pred))
-    print(f"ROC-AUC Score in test: {roc_auc_score(y_test, y_proba):.4f}")
-    print(f"ROC-AUC Score in train: {roc_auc_score(y_train, best_pipe.predict_proba(X_train)[:, 1]):.4f}")
-    print("score in training", best_pipe.score(X_train, y_train))
-    print("score in testing", best_pipe.score(X_test, y_test))
-    
-    return study.best_params
-
-
-def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
+def create_triple_stacking(df, target, params_lr, params_rf):
     X = df.drop(columns=[target])
     y = df[target]
     
@@ -484,18 +432,10 @@ def create_triple_stacking(df, target, params_lr, params_rf, params_svc):
         n_jobs=-1
     )
 
-    model_svc = SVC(
-        C=params_svc['C'],
-        kernel=params_svc['kernel'],
-        gamma=params_svc['gamma'],
-        probability=True,
-        random_state=42
-    )
-
     base_models = [
         ('lr', Pipeline(steps=[('preprocessor', preprocessor), ('model', model_lr)])),
         ('rf', Pipeline(steps=[('preprocessor', preprocessor), ('model', model_rf)])),
-        ('svc', Pipeline(steps=[('preprocessor', preprocessor), ('model', model_svc)]))
+        ('svc', Pipeline(steps=[('preprocessor', preprocessor), ('model', SVC(probability=True, random_state=42))]))
     ]
     cv= StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     stacking_model = StackingClassifier(
