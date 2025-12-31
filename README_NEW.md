@@ -245,9 +245,10 @@ jupyter lab
 <p align="center">
   <img src="reports/figures/heatmap_correlacion.png" width="600" alt="Correlation Heatmap">
 </p>
+
 ### Numerical Features vs Target
 <p align="center">
-  <img src="reports/figures/histogramas_numericos_vs_target.png" width="600" alt="Numerical Features vs Target">
+  <img src="reports/figures/histogramas_numericos.png" width="600" alt="Numerical Features vs Target">
 </p>
 
 ### Feature Importance (Ensemble)
