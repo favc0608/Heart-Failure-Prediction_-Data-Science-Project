@@ -334,7 +334,3 @@ Combined from 5 heart disease datasets:
 
 ---
 
-<p align="center">
-  <strong>⭐ If you found this project useful, please consider giving it a star! ⭐</strong>
-</p>
-
