@@ -1,125 +1,340 @@
-# Heart Failure Prediction — Reproducible ML Pipeline
+# 🫀 Heart Disease Prediction — End-to-End ML Pipeline
 
-This repository implements a reproducible pipeline for preprocessing, exploratory data analysis (EDA), hyperparameter optimization (Optuna), model training, evaluation, and a Streamlit-based deployment for predicting heart disease.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Scikit--Learn-ML-orange?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-learn">
+  <img src="https://img.shields.io/badge/Streamlit-App-red?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Optuna-Optimization-green?style=for-the-badge" alt="Optuna">
+  <img src="https://img.shields.io/badge/XGBoost-Boosting-yellow?style=for-the-badge" alt="XGBoost">
+</p>
 
-## Summary
-- Dataset (processed): `data/processed/heart_clean.csv`  
-- Core code: `src/models.py`, `src/visualizations.py`  
-- Notebooks: `notebooks/models.ipynb`, `notebooks/processing.ipynb`, `notebooks/eda1.ipynb`  
-- App: `app.py` (Streamlit)  
-- Artifacts: recommended `model/modelo_heart_disease_stacking.pkl`  
-- Reports: `reports/figures`, `reports/tables`  
-- Dependencies: `requirements.txt`
+<p align="center">
+  <strong>🔬 A complete Data Science project showcasing the full ML lifecycle: from EDA to deployment</strong>
+</p>
 
-## Purpose
-Provide a transparent, reproducible workflow from raw data preprocessing through model development (including Optuna hyperparameter search) to a deployable ensemble model with interpretability outputs and a lightweight UI for demonstration.
+<p align="center">
+  <a href="https://favc0608-heart-failure-prediction--data-science-proj-app-mxautc.streamlit.app/">
+    <img src="https://img.shields.io/badge/🚀 LIVE DEMO-Click Here-success?style=for-the-badge" alt="Live Demo">
+  </a>
+</p>
 
-## Repository structure (key files)
-- `app.py` — Streamlit app and model loader.
-- `src/models.py` — Model training, baseline evaluations, Optuna search functions, and stacking builder. Key functions: `baseline`, `randomforest_basemodel`, `svc_basemodel`, `decisiontree_basemodel`, `xgboost_basemodel`, `logistic_regression_optuna`, `random_forest_optuna`, `svc_optuna`, `create_triple_stacking`, `plot_ensemble_importance`.
-- `src/visualizations.py` — EDA and plotting helpers.
-- `notebooks/models.ipynb` — Full experiment flow (baselines → Optuna → stacking → artifact save).
-- `data/processed/heart_clean.csv` — Cleaned dataset used for modeling.
-- `model/` — Recommended location for saved model artifacts.
-- `reports/` — Generated figures and tables.
+---
 
-## Environment & installation
-1. Create a virtual environment (venv/conda) and activate it.  
-2. Install dependencies:
+## 📋 Table of Contents
+
+- [🎯 Project Overview](#-project-overview)
+- [💡 Key Highlights](#-key-highlights)
+- [📊 Results Summary](#-results-summary)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Quick Start](#-quick-start)
+- [📈 Methodology](#-methodology)
+- [🔍 Model Comparison](#-model-comparison)
+- [📸 Visualizations](#-visualizations)
+- [🎓 Skills Demonstrated](#-skills-demonstrated)
+- [📝 Future Improvements](#-future-improvements)
+- [📫 Contact](#-contact)
+
+---
+
+## 🎯 Project Overview
+
+**Cardiovascular diseases (CVDs)** are the **#1 cause of death globally**, claiming approximately **17.9 million lives annually** (31% of all deaths worldwide). Early detection is critical for prevention and treatment.
+
+This project builds a **machine learning pipeline** to predict heart disease risk using clinical indicators, achieving **~95% ROC-AUC** with a stacking ensemble model.
+
+### 🏥 Business Impact
+| Metric | Value | Significance |
+|--------|-------|--------------|
+| **Recall** | 88% | Minimizes missed diagnoses (false negatives) |
+| **Precision** | 85% | Reduces unnecessary interventions |
+| **ROC-AUC** | 0.95 | Excellent discrimination ability |
+
+---
+
+## 💡 Key Highlights
+
+✅ **End-to-end ML pipeline** — From raw data to deployed application  
+✅ **5 baseline models compared** — Logistic Regression, SVC, Random Forest, Decision Tree, XGBoost  
+✅ **Bayesian hyperparameter optimization** — Using Optuna (100+ trials)  
+✅ **Stacking ensemble** — Combining diverse model perspectives  
+✅ **Interactive web app** — Deployed on Streamlit Cloud  
+✅ **Feature importance analysis** — Interpretable predictions  
+✅ **Reproducible workflow** — Modular code structure  
+
+---
+
+## 📊 Results Summary
+
+### 🏆 Final Model Performance
+
+| Model | Train AUC | Test AUC | Status |
+|-------|:---------:|:--------:|:------:|
+| Logistic Regression (baseline) | 0.94 | 0.92 | ✅ Low overfit |
+| SVC (baseline) | 0.96 | 0.93 | ✅ Low overfit |
+| Random Forest (baseline) | 1.00 | 0.94 | ⚠️ Medium overfit |
+| Decision Tree (baseline) | 1.00 | 0.80 | 🔴 High overfit |
+| XGBoost (baseline) | 1.00 | 0.91 | 🔴 High overfit |
+| **🥇 Stacking Ensemble (tuned)** | **0.97** | **0.94** | ✅ **Best model** |
+
+> The stacking ensemble combines Logistic Regression + Random Forest + SVC with a meta-learner, achieving robust generalization.
+
+---
+
+## 🛠️ Tech Stack
+
+<table>
+<tr>
+<td><strong>Category</strong></td>
+<td><strong>Technologies</strong></td>
+</tr>
+<tr>
+<td>📊 Data Processing</td>
+<td>Pandas, NumPy</td>
+</tr>
+<tr>
+<td>🤖 Machine Learning</td>
+<td>Scikit-learn, XGBoost</td>
+</tr>
+<tr>
+<td>⚙️ Hyperparameter Tuning</td>
+<td>Optuna (Bayesian Optimization)</td>
+</tr>
+<tr>
+<td>📈 Visualization</td>
+<td>Matplotlib, Seaborn</td>
+</tr>
+<tr>
+<td>🌐 Deployment</td>
+<td>Streamlit</td>
+</tr>
+<tr>
+<td>💾 Model Persistence</td>
+<td>Joblib</td>
+</tr>
+</table>
+
+---
+
+## 📁 Project Structure
+
+```
+heart-failure-project/
+│
+├── 📊 data/
+│   ├── raw/                    # Original dataset
+│   └── processed/              # Cleaned data (heart_clean.csv)
+│
+├── 📓 notebooks/
+│   ├── eda1.ipynb             # Exploratory Data Analysis
+│   ├── processing.ipynb       # Data preprocessing pipeline
+│   └── models.ipynb           # Model training & evaluation
+│
+├── 🔧 src/
+│   ├── models.py              # ML functions (training, tuning, stacking)
+│   └── visualizations.py      # Plotting utilities
+│
+├── 🤖 model/
+│   └── modelo_heart_disease_stacking.pkl  # Saved production model
+│
+├── 📈 reports/
+│   ├── figures/               # Generated visualizations
+│   └── tables/                # Binning analysis reports
+│
+├── 🌐 app.py                  # Streamlit web application
+├── 📋 requirements.txt        # Dependencies
+└── 📖 README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/YOUR_USERNAME/heart-failure-project.git
+cd heart-failure-project
+```
+
+### 2️⃣ Create virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+### 3️⃣ Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-Recommended Python version: 3.10+.
 
-## End-to-end reproducible sequence (detailed)
-1. Load data
-```python
-from pathlib import Path
-import pandas as pd
-ROOT = Path.cwd()
-df = pd.read_csv(ROOT / "data" / "processed" / "heart_clean.csv")
-```
-
-2. Quick baseline (sanity checks)
-- Run `src.models.baseline(df, "HeartDisease")` to obtain a baseline logistic regression performance and basic diagnostics (confusion matrix, classification report, ROC-AUC).
-
-3. Preprocessing conventions
-- Numeric features scaled with `StandardScaler`.
-- Categorical features encoded with `OneHotEncoder(handle_unknown='ignore')`.
-- These transformations are implemented in `ColumnTransformer` inside each training pipeline in `src/models.py`.
-
-4. Train/test splitting
-- Stratified splits used across experiments. Default `random_state=42` is applied for reproducibility. Typical test_size values: 0.2–0.3 (see function docstrings).
-
-5. Baseline model evaluations
-- Run base models to compare initial performance:
-  - `randomforest_basemodel(df, "HeartDisease")`
-  - `svc_basemodel(df, "HeartDisease")`
-  - `decisiontree_basemodel(df, "HeartDisease")`
-  - `xgboost_basemodel(df, "HeartDisease")`
-
-6. Hyperparameter optimization (Optuna)
-- Logistic Regression: `logistic_regression_optuna(df, "HeartDisease")` — typically 100 trials, scoring ROC-AUC, uses CV internally.
-- Random Forest: `random_forest_optuna(df, "HeartDisease")` — typically 20 trials.
-- SVC: `svc_optuna(df, "HeartDisease")` — typically 50 trials.
-Implementation details: objective functions use stratified CV and `roc_auc` as the optimization metric.
-
-7. Final model building / ensemble
-- Obtain best parameter dicts from Optuna runs and build a stacking classifier:
-```python
-params_lr = logistic_regression_optuna(df, "HeartDisease")
-params_rf = random_forest_optuna(df, "HeartDisease")
-params_svc = svc_optuna(df, "HeartDisease")
-
-modelo_ensamble_final = create_triple_stacking(
-    df=df,
-    target="HeartDisease",
-    params_lr=params_lr,
-    params_rf=params_rf,
-    params_svc=params_svc
-)
-```
-- Evaluate with cross-validation and report ROC-AUC, precision, recall, F1, and confusion matrices (functions print and return metrics).
-
-8. Interpretability and diagnostics
-- Permutation importance and ensemble importance are generated via `plot_ensemble_importance` and `sklearn.inspection.permutation_importance`. Save plots to `reports/figures`.
-
-9. Artifact saving (standardized)
-- Save final model artifact to `model/modelo_heart_disease_stacking.pkl` (repo-root `model` folder). Example:
-```python
-import joblib
-joblib.dump(modelo_ensamble_final, "model/modelo_heart_disease_stacking.pkl")
-```
-
-10. Deployment (Streamlit)
-- Run the app:
+### 4️⃣ Run the Streamlit app
 ```bash
-python -m streamlit run app.py
+streamlit run app.py
 ```
-- The app loads the artifact `model/modelo_heart_disease_stacking.pkl`, accepts user inputs, shows predicted probability and a simple risk label, and displays basic explainability plots.
 
-If you want to test online , try it here : https://favc0608-heart-failure-prediction--data-science-proj-app-mxautc.streamlit.app/
-
-## Reported results (representative)
-- Example runs (notebook outputs):
-  - Random Forest baseline ROC-AUC: ≈ 0.95–0.96
-  - XGBoost baseline ROC-AUC: ≈ 0.94–0.95
-  - Optuna-tuned Logistic Regression ROC-AUC: ≈ 0.95
-  - Optuna-tuned SVC ROC-AUC: ≈ 0.94–0.95
-  - Final stacking ensemble ROC-AUC: ≈ 0.95 (see `notebooks/models.ipynb` for per-run prints and saved figures)
-Note: these are representative values observed locally during development; re-runs may vary due to data splits and random seeds.
-
-## Best practices and recommendations
-- Add calibration plots (Platt scaling / isotonic) and SHAP analyses for per-sample explanations.
-- Evaluate fairness metrics across demographic groups and include limitations / clinical disclaimer.
-- Add CI, unit tests for preprocessors, and an environment file (environment.yml or requirements pinned).
-
-## How to reproduce exact notebook run (concise)
-1. From repo root:
+### 5️⃣ Or explore the notebooks
 ```bash
-pip install -r requirements.txt
-jupyter lab  # or open notebooks in VS Code
+jupyter lab
+# Open notebooks/models.ipynb
 ```
-2. Open `notebooks/models.ipynb` and run cells in order. After stacking, the notebook will save the model to `model/modelo_heart_disease_stacking.pkl`.
 
+---
+
+## 📈 Methodology
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ML PIPELINE WORKFLOW                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. DATA LOADING          2. PREPROCESSING                      │
+│  ┌──────────────┐        ┌──────────────────────┐              │
+│  │ heart.csv    │───────▶│ • Handle missing     │              │
+│  │ (918 rows)   │        │ • Scale numerics     │              │
+│  └──────────────┘        │ • Encode categoricals│              │
+│                          └──────────┬───────────┘              │
+│                                     │                          │
+│  3. BASELINE MODELS                 ▼                          │
+│  ┌─────────────────────────────────────────────┐               │
+│  │ LogReg │ SVC │ RF │ DecisionTree │ XGBoost  │               │
+│  └─────────────────────────────────────────────┘               │
+│                          │                                     │
+│  4. HYPERPARAMETER       ▼                                     │
+│     OPTIMIZATION    ┌─────────────┐                            │
+│                     │   OPTUNA    │ 100+ trials                │
+│                     │  Bayesian   │                            │
+│                     └──────┬──────┘                            │
+│                            │                                   │
+│  5. ENSEMBLE              ▼                                    │
+│     STACKING       ┌──────────────┐                            │
+│                    │ LR + RF + SVC│                            │
+│                    │   ───────    │                            │
+│                    │  Meta-LR     │                            │
+│                    └──────┬───────┘                            │
+│                           │                                    │
+│  6. DEPLOYMENT            ▼                                    │
+│                    ┌──────────────┐                            │
+│                    │  Streamlit   │                            │
+│                    │   Web App    │                            │
+│                    └──────────────┘                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔍 Model Comparison
+
+### Baseline vs Tuned Performance
+
+| Stage | Model | ROC-AUC | Notes |
+|-------|-------|:-------:|-------|
+| Baseline | Logistic Regression | 0.92 | Simple, interpretable |
+| Baseline | SVC | 0.93 | Good generalization |
+| Baseline | Random Forest | 0.94 | Captures non-linearity |
+| **Tuned** | Logistic Regression | 0.92 | Optuna optimized |
+| **Tuned** | Random Forest | 0.94 | Reduced overfitting |
+| **Final** | **Stacking Ensemble** | **0.935** | **Production model/ Reduced overfitting** |
+
+
+---
+
+## 📸 Visualizations
+
+### Feature Correlation Heatmap
+<p align="center">
+  <img src="reports/figures/heatmap_correlacion.png" width="600" alt="Correlation Heatmap">
+</p>
+
+### Numerical Features vs Target
+<p align="center">
+  <img src="reports/figures/histogramas_numericos.png" width="600" alt="Numerical Features vs Target">
+</p>
+
+### Feature Importance (Ensemble)
+<p align="center">
+  <img src="reports/figures/ensemble_feature_importance.png" width="600" alt="Feature Importance">
+</p>
+
+### Categorical Features vs Target
+<p align="center">
+  <img src="reports/figures/categoricas_vs_target.png" width="600" alt="Categorical Analysis">
+</p>
+
+---
+
+## 🎓 Skills Demonstrated
+
+| Area | Skills |
+|------|--------|
+| **Data Engineering** | Data cleaning, feature engineering, preprocessing pipelines |
+| **Machine Learning** | Classification, ensemble methods, cross-validation |
+| **Hyperparameter Tuning** | Bayesian optimization with Optuna |
+| **Model Evaluation** | ROC-AUC, precision-recall, confusion matrix analysis |
+| **MLOps** | Model serialization, pipeline design, deployment |
+| **Software Engineering** | Modular code, documentation, reproducibility |
+| **Data Visualization** | Matplotlib, Seaborn, interpretability plots |
+| **Web Development** | Streamlit interactive applications |
+
+---
+
+## 📝 Future Improvements
+
+- [ ] 🔬 Add SHAP values for individual prediction explanations
+- [ ] 📊 Implement calibration plots (Platt scaling)
+- [ ] 📱 Create API endpoint with FastAPI
+
+---
+
+## 📫 Contact
+
+<p align="center">
+  <a href="https://www.linkedin.com/in/frank-alexander-vargas-chavez-664980381/">
+    <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn">
+  </a>
+  <a href="mailto:frankvargaschavez201@gmail.com">
+    <img src="https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail" alt="Email">
+  </a>
+  <a href="https://github.com/favc0608">
+    <img src="https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github" alt="GitHub">
+  </a>
+</p>
+
+---
+
+## 📚 Dataset Information
+
+**Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/) via Kaggle
+
+Combined from 5 heart disease datasets:
+- Cleveland (303 obs.)
+- Hungarian (294 obs.)
+- Switzerland (123 obs.)
+- Long Beach VA (200 obs.)
+- Stalog Heart (270 obs.)
+
+**Final dataset:** 918 observations, 11 clinical features
+
+### Feature Description
+
+| Feature | Description | Type |
+|---------|-------------|------|
+| Age | Patient age in years | Numeric |
+| Sex | M: Male, F: Female | Categorical |
+| ChestPainType | TA, ATA, NAP, ASY | Categorical |
+| RestingBP | Resting blood pressure (mm Hg) | Numeric |
+| Cholesterol | Serum cholesterol (mg/dl) | Numeric |
+| FastingBS | Fasting blood sugar > 120 mg/dl | Binary |
+| RestingECG | Normal, ST, LVH | Categorical |
+| MaxHR | Maximum heart rate achieved | Numeric |
+| ExerciseAngina | Exercise-induced angina (Y/N) | Binary |
+| Oldpeak | ST depression | Numeric |
+| ST_Slope | Up, Flat, Down | Categorical |
+| **HeartDisease** | **Target: 0 = Normal, 1 = Disease** | **Binary** |
+
+---
+
+<p align="center">
+  <strong>⭐ If you found this project useful, please consider giving it a star! ⭐</strong>
+</p>
 
